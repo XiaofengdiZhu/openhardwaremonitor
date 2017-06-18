@@ -14,6 +14,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using OpenHardwareMonitor.Hardware;
+using System.Text;
 
 namespace OpenHardwareMonitor.Utilities {
   public class Logger {
@@ -121,7 +122,7 @@ namespace OpenHardwareMonitor.Utilities {
       sensors = list.ToArray();
       identifiers = sensors.Select(s => s.Identifier.ToString()).ToArray();
 
-      using (StreamWriter writer = new StreamWriter(fileName, false)) {
+      using (StreamWriter writer = new StreamWriter(fileName, false, Encoding.UTF8)) {
         writer.Write(",");
         for (int i = 0; i < sensors.Length; i++) {
           writer.Write(sensors[i].Identifier);
@@ -134,7 +135,7 @@ namespace OpenHardwareMonitor.Utilities {
         writer.Write("Time,");
         for (int i = 0; i < sensors.Length; i++) {
           writer.Write('"');
-          writer.Write(sensors[i].Name);
+          writer.Write(Translate.toChinese(sensors[i]));
           writer.Write('"');
           if (i < sensors.Length - 1)
             writer.Write(",");
