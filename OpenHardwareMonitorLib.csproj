@@ -93,6 +93,8 @@
     <Compile Include="Hardware\LPC\NCT677X.cs" />
     <Compile Include="Hardware\Mainboard\GigabyteTAMG.cs" />
     <Compile Include="Hardware\Mainboard\Identification.cs" />
+    <Compile Include="Hardware\Nic\Nic.cs" />
+    <Compile Include="Hardware\Nic\NicGroup.cs" />
     <Compile Include="Hardware\Opcode.cs" />
     <Compile Include="Hardware\OperatingSystem.cs" />
     <Compile Include="Hardware\RAM\GenericRAM.cs" />
@@ -141,6 +143,7 @@
     <Compile Include="Collections\ListSet.cs" />
     <Compile Include="Hardware\PInvokeDelegateFactory.cs" />
     <Compile Include="Collections\ReadOnlyArray.cs" />
+    <Compile Include="Hardware\Translate.cs" />
     <Compile Include="Properties\AssemblyLibInfo.cs" />
     <Compile Include="Properties\AssemblyVersion.cs" />
     <Compile Include="Hardware\ThreadAffinity.cs" />

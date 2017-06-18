@@ -1,11 +1,11 @@
 ﻿/*
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
- 
+
   Copyright (C) 2009-2013 Michael Möller <mmoeller@openhardwaremonitor.org>
-	
+
 */
 
 using System;
@@ -19,6 +19,7 @@ using OxyPlot.Axes;
 using OxyPlot.WindowsForms;
 using OxyPlot.Series;
 using OpenHardwareMonitor.Collections;
+using System.Diagnostics;
 
 namespace OpenHardwareMonitor.GUI {
   public class PlotPanel : UserControl {
@@ -68,7 +69,7 @@ namespace OpenHardwareMonitor.GUI {
     private ContextMenu CreateMenu() {
       ContextMenu menu = new ContextMenu();
 
-      MenuItem stackedAxesMenuItem = new MenuItem("Stacked Axes");
+      MenuItem stackedAxesMenuItem = new MenuItem("水平轴");
       stackedAxes = new UserOption("stackedAxes", true,
         stackedAxesMenuItem, settings);
       stackedAxes.Changed += (sender, e) => {
@@ -77,33 +78,33 @@ namespace OpenHardwareMonitor.GUI {
       };
       menu.MenuItems.Add(stackedAxesMenuItem);
 
-      MenuItem timeWindow = new MenuItem("Time Window");
+      MenuItem timeWindow = new MenuItem("窗口显示时长");
       MenuItem[] timeWindowMenuItems =
-        { new MenuItem("Auto", 
+        { new MenuItem("自动",
             (s, e) => { timeAxis.Zoom(0, double.NaN); InvalidatePlot(); }),
-          new MenuItem("5 min", 
+          new MenuItem("5分钟",
             (s, e) => { timeAxis.Zoom(0, 5 * 60); InvalidatePlot(); }),
-          new MenuItem("10 min", 
+          new MenuItem("10分钟",
             (s, e) => { timeAxis.Zoom(0, 10 * 60); InvalidatePlot(); }),
-          new MenuItem("20 min", 
+          new MenuItem("20分钟",
             (s, e) => { timeAxis.Zoom(0, 20 * 60); InvalidatePlot(); }),
-          new MenuItem("30 min", 
+          new MenuItem("30分钟",
             (s, e) => { timeAxis.Zoom(0, 30 * 60); InvalidatePlot(); }),
-          new MenuItem("45 min", 
+          new MenuItem("45分钟",
             (s, e) => { timeAxis.Zoom(0, 45 * 60); InvalidatePlot(); }),
-          new MenuItem("1 h", 
+          new MenuItem("1小时",
             (s, e) => { timeAxis.Zoom(0, 60 * 60); InvalidatePlot(); }),
-          new MenuItem("1.5 h", 
+          new MenuItem("1.5小时",
             (s, e) => { timeAxis.Zoom(0, 1.5 * 60 * 60); InvalidatePlot(); }),
-          new MenuItem("2 h", 
+          new MenuItem("2小时",
             (s, e) => { timeAxis.Zoom(0, 2 * 60 * 60); InvalidatePlot(); }),
-          new MenuItem("3 h", 
+          new MenuItem("3小时",
             (s, e) => { timeAxis.Zoom(0, 3 * 60 * 60); InvalidatePlot(); }),
-          new MenuItem("6 h", 
+          new MenuItem("6小时",
             (s, e) => { timeAxis.Zoom(0, 6 * 60 * 60); InvalidatePlot(); }),
-          new MenuItem("12 h", 
+          new MenuItem("12小时",
             (s, e) => { timeAxis.Zoom(0, 12 * 60 * 60); InvalidatePlot(); }),
-          new MenuItem("24 h", 
+          new MenuItem("24小时",
             (s, e) => { timeAxis.Zoom(0, 24 * 60 * 60); InvalidatePlot(); }) };
       foreach (MenuItem mi in timeWindowMenuItems)
         timeWindow.MenuItems.Add(mi);
@@ -156,7 +157,7 @@ namespace OpenHardwareMonitor.GUI {
         axis.MinorGridlineThickness = 1;
         axis.MinorGridlineColor = timeAxis.MinorGridlineColor;
         axis.AxislineStyle = LineStyle.Solid;
-        axis.Title = type.ToString();
+        axis.Title = Translate.toChinese(type.ToString());
         axis.Key = type.ToString();
 
         axis.Zoom(
@@ -189,7 +190,7 @@ namespace OpenHardwareMonitor.GUI {
         if (sensor.SensorType == SensorType.Temperature) {
           series.ItemsSource = sensor.Values.Select(value => new DataPoint {
             X = (now - value.Time).TotalSeconds,
-            Y = unitManager.TemperatureUnit == TemperatureUnit.Celsius ? 
+            Y = unitManager.TemperatureUnit == TemperatureUnit.Celsius ?
               value.Value : UnitManager.CelsiusToFahrenheit(value.Value).Value
           });
         } else {
@@ -200,7 +201,7 @@ namespace OpenHardwareMonitor.GUI {
         series.Color = colors[sensor].ToOxyColor();
         series.StrokeThickness = 1;
         series.YAxisKey = axes[sensor.SensorType].Key;
-        series.Title = sensor.Hardware.Name + " " + sensor.Name;
+        series.Title = Translate.toChinese(sensor.Hardware.Name) + " " + Translate.toChinese(sensor);
         this.model.Series.Add(series);
 
         types.Add(sensor.SensorType);
@@ -210,7 +211,7 @@ namespace OpenHardwareMonitor.GUI {
         var axis = pair.Value;
         var type = pair.Key;
         axis.IsAxisVisible = types.Contains(type);
-      } 
+      }
 
       UpdateAxesPosition();
       InvalidatePlot();
@@ -229,7 +230,7 @@ namespace OpenHardwareMonitor.GUI {
           axis.EndPosition = start;
           axis.PositionTier = 0;
           axis.MajorGridlineStyle = LineStyle.Solid;
-          axis.MinorGridlineStyle = LineStyle.Solid;   
+          axis.MinorGridlineStyle = LineStyle.Solid;
         }
       } else {
         var tier = 0;
@@ -247,7 +248,7 @@ namespace OpenHardwareMonitor.GUI {
             axis.PositionTier = 0;
           }
           axis.MajorGridlineStyle = LineStyle.None;
-          axis.MinorGridlineStyle = LineStyle.None;          
+          axis.MinorGridlineStyle = LineStyle.None;
         }
       }
 

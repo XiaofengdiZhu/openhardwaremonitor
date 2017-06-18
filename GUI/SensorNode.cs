@@ -1,11 +1,11 @@
 ﻿/*
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
- 
+
   Copyright (C) 2009-2016 Michael Möller <mmoeller@openhardwaremonitor.org>
-	
+
 */
 
 using System;
@@ -16,7 +16,7 @@ using OpenHardwareMonitor.Utilities;
 
 namespace OpenHardwareMonitor.GUI {
   public class SensorNode : Node {
-    
+
     private ISensor sensor;
     private PersistentSettings settings;
     private UnitManager unitManager;
@@ -26,18 +26,39 @@ namespace OpenHardwareMonitor.GUI {
 
     public string ValueToString(float? value) {
       if (value.HasValue) {
-        if (sensor.SensorType == SensorType.Temperature && 
+        if (sensor.SensorType == SensorType.Temperature &&
           unitManager.TemperatureUnit == TemperatureUnit.Fahrenheit) {
           return string.Format("{0:F1} °F", value * 1.8 + 32);
+        } else if(sensor.SensorType == SensorType.InternetSpeed){
+          string result = "-";
+          switch (sensor.Name){ 
+            case "Connection Speed": {
+              switch (value){ 
+                case 100000000: result = "100Mbps";break;
+                case 1000000000: result = "1Gbps";break;
+                default: {
+                  if(value < 1024) result = string.Format("{0:F0} bps", value);
+                  else if(value < 1048576) result = string.Format("{0:F1} Kbps",value/1024);
+                  else if(value < 1073741824) result = string.Format("{0:F1} Mbps",value/1048576);
+                  else result = string.Format("{0:F1} Gbps",value/ 1073741824);
+                } break;
+              }
+            }break;
+            default:{
+              if(value<1048576) result = string.Format("{0:F1} KB/s",value/1024);
+              else result = string.Format("{0:F1} MB/s",value/1048576);
+            } break;
+          }
+          return result;
         } else {
           return string.Format(format, value);
-        }                
+        }
       } else
         return "-";
     }
 
-    public SensorNode(ISensor sensor, PersistentSettings settings, 
-      UnitManager unitManager) : base() {      
+    public SensorNode(ISensor sensor, PersistentSettings settings,
+      UnitManager unitManager) : base() {
       this.sensor = sensor;
       this.settings = settings;
       this.unitManager = unitManager;
@@ -54,13 +75,14 @@ namespace OpenHardwareMonitor.GUI {
         case SensorType.Data: format = "{0:F1} GB"; break;
         case SensorType.SmallData: format = "{0:F1} MB"; break;
         case SensorType.Factor: format = "{0:F3}"; break;
+        case SensorType.InternetSpeed: format = "{0:F1} B/s"; break;
       }
 
-      bool hidden = settings.GetValue(new Identifier(sensor.Identifier, 
+      bool hidden = settings.GetValue(new Identifier(sensor.Identifier,
         "hidden").ToString(), sensor.IsDefaultHidden);
       base.IsVisible = !hidden;
 
-      this.Plot = settings.GetValue(new Identifier(sensor.Identifier, 
+      this.Plot = settings.GetValue(new Identifier(sensor.Identifier,
         "plot").ToString(), false);
 
       string id = new Identifier(sensor.Identifier, "penColor").ToString();
@@ -69,13 +91,13 @@ namespace OpenHardwareMonitor.GUI {
     }
 
     public override string Text {
-      get { return sensor.Name; }
+      get { return Translate.toChinese(sensor); }
       set { sensor.Name = value; }
     }
 
     public override bool IsVisible {
       get { return base.IsVisible; }
-      set { 
+      set {
         base.IsVisible = value;
         settings.SetValue(new Identifier(sensor.Identifier,
           "hidden").ToString(), !value);
@@ -100,9 +122,9 @@ namespace OpenHardwareMonitor.GUI {
 
     public bool Plot {
       get { return plot; }
-      set { 
+      set {
         plot = value;
-        settings.SetValue(new Identifier(sensor.Identifier, "plot").ToString(), 
+        settings.SetValue(new Identifier(sensor.Identifier, "plot").ToString(),
           value);
         if (PlotSelectionChanged != null)
           PlotSelectionChanged(this, null);
@@ -128,11 +150,11 @@ namespace OpenHardwareMonitor.GUI {
     }
 
     public override bool Equals(System.Object obj) {
-      if (obj == null) 
+      if (obj == null)
         return false;
 
       SensorNode s = obj as SensorNode;
-      if (s == null) 
+      if (s == null)
         return false;
 
       return (sensor == s.sensor);

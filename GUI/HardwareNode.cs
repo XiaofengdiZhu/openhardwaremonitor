@@ -41,7 +41,7 @@ namespace OpenHardwareMonitor.GUI {
     }
 
     public override string Text {
-      get { return hardware.Name; }
+      get { return Translate.toChinese(hardware.Name); }
       set { hardware.Name = value; }
     }
 

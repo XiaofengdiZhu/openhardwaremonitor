@@ -23,6 +23,8 @@ namespace OpenHardwareMonitor.Hardware {
     bool FanControllerEnabled { get; }
     bool HDDEnabled { get; }
 
+    bool NICEnabled { get; }
+
 
     string GetReport();
 

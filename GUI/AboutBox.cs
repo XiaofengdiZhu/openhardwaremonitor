@@ -20,7 +20,7 @@ namespace OpenHardwareMonitor.GUI {
     public AboutBox() {
       InitializeComponent();
       this.Font = SystemFonts.MessageBoxFont;
-      this.label3.Text = "Version " + 
+      this.label3.Text = "版本 " + 
         System.Windows.Forms.Application.ProductVersion;
 
       projectLinkLabel.Links.Remove(projectLinkLabel.Links[0]);
@@ -30,6 +30,10 @@ namespace OpenHardwareMonitor.GUI {
       licenseLinkLabel.Links.Remove(licenseLinkLabel.Links[0]);
       licenseLinkLabel.Links.Add(0, licenseLinkLabel.Text.Length,
         "License.html");
+
+      linkLabel1.Links.Remove(linkLabel1.Links[0]);
+      linkLabel1.Links.Add(0, linkLabel1.Text.Length,
+        "http://tieba.baidu.com/home/main/?un=%E9%94%80%E9%94%8B%E9%95%9D%E9%93%B8&ie=utf-8");
     }
 
     private void linkLabel_LinkClicked(object sender, 

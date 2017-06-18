@@ -1,9 +1,9 @@
 /*
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
- 
+
   Copyright (C) 2009-2013 Michael Möller <mmoeller@openhardwaremonitor.org>
 	Copyright (C) 2010 Paul Werelds <paul@werelds.net>
 	Copyright (C) 2012 Prince Samuel <prince.samuel@gmail.com>
@@ -32,10 +32,10 @@ namespace OpenHardwareMonitor.GUI {
     private Computer computer;
     private Node root;
     private TreeModel treeModel;
-    private IDictionary<ISensor, Color> sensorPlotColors = 
+    private IDictionary<ISensor, Color> sensorPlotColors =
       new Dictionary<ISensor, Color>();
     private Color[] plotColorPalette;
-    private SystemTray systemTray;    
+    private SystemTray systemTray;
     private StartupManager startupManager = new StartupManager();
     private UpdateVisitor updateVisitor = new UpdateVisitor();
     private SensorGadget gadget;
@@ -58,6 +58,7 @@ namespace OpenHardwareMonitor.GUI {
     private UserOption readGpuSensors;
     private UserOption readFanControllersSensors;
     private UserOption readHddSensors;
+    private UserOption readNicSensors;
 
     private UserOption showGadget;
     private UserRadioGroup plotLocation;
@@ -72,7 +73,7 @@ namespace OpenHardwareMonitor.GUI {
 
     private bool selectionDragging = false;
 
-    public MainForm() {      
+    public MainForm() {
       InitializeComponent();
 
       // check if the OpenHardwareMonitorLib assembly has the correct version
@@ -84,27 +85,27 @@ namespace OpenHardwareMonitor.GUI {
         Environment.Exit(0);
       }
 
-      this.settings = new PersistentSettings();      
+      this.settings = new PersistentSettings();
       this.settings.Load(Path.ChangeExtension(
         Application.ExecutablePath, ".config"));
 
       this.unitManager = new UnitManager(settings);
 
-      // make sure the buffers used for double buffering are not disposed 
+      // make sure the buffers used for double buffering are not disposed
       // after each draw call
       BufferedGraphicsManager.Current.MaximumBuffer =
-        Screen.PrimaryScreen.Bounds.Size;  
+        Screen.PrimaryScreen.Bounds.Size;
 
       // set the DockStyle here, to avoid conflicts with the MainMenu
       this.splitContainer.Dock = DockStyle.Fill;
-            
+
       this.Font = SystemFonts.MessageBoxFont;
       treeView.Font = SystemFonts.MessageBoxFont;
 
       plotPanel = new PlotPanel(settings, unitManager);
       plotPanel.Font = SystemFonts.MessageBoxFont;
       plotPanel.Dock = DockStyle.Fill;
-      
+
       nodeCheckBox.IsVisibleValueNeeded += nodeCheckBox_IsVisibleValueNeeded;
       nodeTextBoxText.DrawText += nodeTextBoxText_DrawText;
       nodeTextBoxValue.DrawText += nodeTextBoxText_DrawText;
@@ -112,7 +113,7 @@ namespace OpenHardwareMonitor.GUI {
       nodeTextBoxMax.DrawText += nodeTextBoxText_DrawText;
       nodeTextBoxText.EditorShowing += nodeTextBoxText_EditorShowing;
 
-      foreach (TreeColumn column in treeView.Columns) 
+      foreach (TreeColumn column in treeView.Columns)
         column.Width = Math.Max(20, Math.Min(400,
           settings.GetValue("treeView.Columns." + column.Header + ".Width",
           column.Width)));
@@ -120,7 +121,7 @@ namespace OpenHardwareMonitor.GUI {
       treeModel = new TreeModel();
       root = new Node(System.Environment.MachineName);
       root.Image = Utilities.EmbeddedResources.GetImage("computer.png");
-      
+
       treeModel.Nodes.Add(root);
       treeView.Model = treeModel;
 
@@ -132,7 +133,7 @@ namespace OpenHardwareMonitor.GUI {
 
       int p = (int)Environment.OSVersion.Platform;
       if ((p == 4) || (p == 128)) { // Unix
-        treeView.RowHeight = Math.Max(treeView.RowHeight, 18); 
+        treeView.RowHeight = Math.Max(treeView.RowHeight, 18);
         splitContainer.BorderStyle = BorderStyle.None;
         splitContainer.Border3DStyle = Border3DStyle.Adjust;
         splitContainer.SplitterWidth = 4;
@@ -143,7 +144,7 @@ namespace OpenHardwareMonitor.GUI {
         minTrayMenuItem.Visible = false;
         startMinMenuItem.Visible = false;
       } else { // Windows
-        treeView.RowHeight = Math.Max(treeView.Font.Height + 1, 18); 
+        treeView.RowHeight = Math.Max(treeView.Font.Height + 1, 18);
 
         gadget = new SensorGadget(computer, settings, unitManager);
         gadget.HideShowCommand += hideShowClick;
@@ -167,9 +168,9 @@ namespace OpenHardwareMonitor.GUI {
       plotColorPalette[10] = Color.MediumSeaGreen;
       plotColorPalette[11] = Color.Olive;
       plotColorPalette[12] = Color.Firebrick;
-      
+
       computer.HardwareAdded += new HardwareEventHandler(HardwareAdded);
-      computer.HardwareRemoved += new HardwareEventHandler(HardwareRemoved);        
+      computer.HardwareRemoved += new HardwareEventHandler(HardwareRemoved);
 
       computer.Open();
 
@@ -215,13 +216,13 @@ namespace OpenHardwareMonitor.GUI {
         try {
           startupManager.Startup = autoStart.Value;
         } catch (InvalidOperationException) {
-          MessageBox.Show("Updating the auto-startup option failed.", "Error", 
+          MessageBox.Show("Updating the auto-startup option failed.", "Error",
             MessageBoxButtons.OK, MessageBoxIcon.Error);
           autoStart.Value = startupManager.Startup;
         }
       };
 
-      readMainboardSensors = new UserOption("mainboardMenuItem", true, 
+      readMainboardSensors = new UserOption("mainboardMenuItem", true,
         mainboardMenuItem, settings);
       readMainboardSensors.Changed += delegate(object sender, EventArgs e) {
         computer.MainboardEnabled = readMainboardSensors.Value;
@@ -257,14 +258,20 @@ namespace OpenHardwareMonitor.GUI {
         computer.HDDEnabled = readHddSensors.Value;
       };
 
+      readNicSensors = new UserOption("nicMenuItem", true, nicMenuItem,
+        settings);
+      readNicSensors.Changed += delegate(object sender, EventArgs e) {
+        computer.NICEnabled = readNicSensors.Value;
+      };
+
       showGadget = new UserOption("gadgetMenuItem", false, gadgetMenuItem,
         settings);
       showGadget.Changed += delegate(object sender, EventArgs e) {
-        if (gadget != null) 
+        if (gadget != null)
           gadget.Visible = showGadget.Value;
       };
 
-      celsiusMenuItem.Checked = 
+      celsiusMenuItem.Checked =
         unitManager.TemperatureUnit == TemperatureUnit.Celsius;
       fahrenheitMenuItem.Checked = !celsiusMenuItem.Checked;
 
@@ -288,8 +295,8 @@ namespace OpenHardwareMonitor.GUI {
 
       loggingInterval = new UserRadioGroup("loggingInterval", 0,
         new[] { log1sMenuItem, log2sMenuItem, log5sMenuItem, log10sMenuItem,
-        log30sMenuItem, log1minMenuItem, log2minMenuItem, log5minMenuItem, 
-        log10minMenuItem, log30minMenuItem, log1hMenuItem, log2hMenuItem, 
+        log30sMenuItem, log1minMenuItem, log2minMenuItem, log5minMenuItem,
+        log10minMenuItem, log30minMenuItem, log1hMenuItem, log2hMenuItem,
         log6hMenuItem},
         settings);
       loggingInterval.Changed += (sender, e) => {
@@ -313,7 +320,7 @@ namespace OpenHardwareMonitor.GUI {
       InitializePlotForm();
 
       startupMenuItem.Visible = startupManager.IsAvailable;
-      
+
       if (startMinMenuItem.Checked) {
         if (!minTrayMenuItem.Checked) {
           WindowState = FormWindowState.Minimized;
@@ -323,14 +330,14 @@ namespace OpenHardwareMonitor.GUI {
         Show();
       }
 
-      // Create a handle, otherwise calling Close() does not fire FormClosed     
+      // Create a handle, otherwise calling Close() does not fire FormClosed
       IntPtr handle = Handle;
 
       // Make sure the settings are saved when the user logs off
       Microsoft.Win32.SystemEvents.SessionEnded += delegate {
         computer.Close();
         SaveConfiguration();
-        if (runWebServer.Value) 
+        if (runWebServer.Value)
           server.Quit();
       };
     }
@@ -435,24 +442,24 @@ namespace OpenHardwareMonitor.GUI {
     private void InsertSorted(Collection<Node> nodes, HardwareNode node) {
       int i = 0;
       while (i < nodes.Count && nodes[i] is HardwareNode &&
-        ((HardwareNode)nodes[i]).Hardware.HardwareType < 
+        ((HardwareNode)nodes[i]).Hardware.HardwareType <
           node.Hardware.HardwareType)
         i++;
       nodes.Insert(i, node);
     }
-    
+
     private void SubHardwareAdded(IHardware hardware, Node node) {
-      HardwareNode hardwareNode = 
+      HardwareNode hardwareNode =
         new HardwareNode(hardware, settings, unitManager);
       hardwareNode.PlotSelectionChanged += PlotSelectionChanged;
 
       InsertSorted(node.Nodes, hardwareNode);
 
       foreach (IHardware subHardware in hardware.SubHardware)
-        SubHardwareAdded(subHardware, hardwareNode);  
+        SubHardwareAdded(subHardware, hardwareNode);
     }
 
-    private void HardwareAdded(IHardware hardware) {      
+    private void HardwareAdded(IHardware hardware) {
       SubHardwareAdded(hardware, root);
       PlotSelectionChanged(this, null);
     }
@@ -471,7 +478,7 @@ namespace OpenHardwareMonitor.GUI {
       PlotSelectionChanged(this, null);
     }
 
-    private void nodeTextBoxText_DrawText(object sender, DrawEventArgs e) {       
+    private void nodeTextBoxText_DrawText(object sender, DrawEventArgs e) {
       Node node = e.Node.Tag as Node;
       if (node != null) {
         Color color;
@@ -504,10 +511,10 @@ namespace OpenHardwareMonitor.GUI {
         }
       }
 
-      // if a sensor is assigned a color that's already being used by another 
-      // sensor, try to assign it a new color. This is done only after the 
-      // previous loop sets an unchanging default color for all sensors, so that 
-      // colors jump around as little as possible as sensors get added/removed 
+      // if a sensor is assigned a color that's already being used by another
+      // sensor, try to assign it a new color. This is done only after the
+      // previous loop sets an unchanging default color for all sensors, so that
+      // colors jump around as little as possible as sensors get added/removed
       // from the plot
       var usedColors = new List<Color>();
       foreach (var curSelectedSensor in selected) {
@@ -537,14 +544,14 @@ namespace OpenHardwareMonitor.GUI {
     }
 
     private void nodeTextBoxText_EditorShowing(object sender,
-      CancelEventArgs e) 
+      CancelEventArgs e)
     {
       e.Cancel = !(treeView.CurrentNode != null &&
-        (treeView.CurrentNode.Tag is SensorNode || 
+        (treeView.CurrentNode.Tag is SensorNode ||
          treeView.CurrentNode.Tag is HardwareNode));
     }
 
-    private void nodeCheckBox_IsVisibleValueNeeded(object sender, 
+    private void nodeCheckBox_IsVisibleValueNeeded(object sender,
       NodeControlValueEventArgs e) {
       SensorNode node = e.Node.Tag as SensorNode;
       e.Value = (node != null) && plotMenuItem.Checked;
@@ -624,11 +631,11 @@ namespace OpenHardwareMonitor.GUI {
 
       this.Bounds = newBounds;
     }
-    
+
     private void MainForm_FormClosed(object sender, FormClosedEventArgs e) {
-      Visible = false;      
+      Visible = false;
       systemTray.IsMainIconEnabled = false;
-      timer.Enabled = false;            
+      timer.Enabled = false;
       computer.Close();
       SaveConfiguration();
       if (runWebServer.Value)
@@ -655,27 +662,27 @@ namespace OpenHardwareMonitor.GUI {
         if (node != null && node.Sensor != null) {
           treeContextMenu.MenuItems.Clear();
           if (node.Sensor.Parameters.Length > 0) {
-            MenuItem item = new MenuItem("Parameters...");
+            MenuItem item = new MenuItem("限制...");
             item.Click += delegate(object obj, EventArgs args) {
               ShowParameterForm(node.Sensor);
             };
             treeContextMenu.MenuItems.Add(item);
           }
           if (nodeTextBoxText.EditEnabled) {
-            MenuItem item = new MenuItem("Rename");
+            MenuItem item = new MenuItem("重命名");
             item.Click += delegate(object obj, EventArgs args) {
               nodeTextBoxText.BeginEdit();
             };
             treeContextMenu.MenuItems.Add(item);
           }
           if (node.IsVisible) {
-            MenuItem item = new MenuItem("Hide");
+            MenuItem item = new MenuItem("隐藏");
             item.Click += delegate(object obj, EventArgs args) {
               node.IsVisible = false;
             };
             treeContextMenu.MenuItems.Add(item);
           } else {
-            MenuItem item = new MenuItem("Unhide");
+            MenuItem item = new MenuItem("显示");
             item.Click += delegate(object obj, EventArgs args) {
               node.IsVisible = true;
             };
@@ -683,7 +690,7 @@ namespace OpenHardwareMonitor.GUI {
           }
           treeContextMenu.MenuItems.Add(new MenuItem("-"));
           {
-            MenuItem item = new MenuItem("Pen Color...");
+            MenuItem item = new MenuItem("图表中轨迹颜色...");
             item.Click += delegate(object obj, EventArgs args) {
               ColorDialog dialog = new ColorDialog();
               dialog.Color = node.PenColor.GetValueOrDefault();
@@ -693,7 +700,7 @@ namespace OpenHardwareMonitor.GUI {
             treeContextMenu.MenuItems.Add(item);
           }
           {
-            MenuItem item = new MenuItem("Reset Pen Color");
+            MenuItem item = new MenuItem("重置轨迹颜色");
             item.Click += delegate(object obj, EventArgs args) {
               node.PenColor = null;
             };
@@ -701,7 +708,7 @@ namespace OpenHardwareMonitor.GUI {
           }
           treeContextMenu.MenuItems.Add(new MenuItem("-"));
           {
-            MenuItem item = new MenuItem("Show in Tray");
+            MenuItem item = new MenuItem("在托盘显示");
             item.Checked = systemTray.Contains(node.Sensor);
             item.Click += delegate(object obj, EventArgs args) {
               if (item.Checked)
@@ -712,7 +719,7 @@ namespace OpenHardwareMonitor.GUI {
             treeContextMenu.MenuItems.Add(item);
           }
           if (gadget != null) {
-            MenuItem item = new MenuItem("Show in Gadget");
+            MenuItem item = new MenuItem("在悬浮窗显示");
             item.Checked = gadget.Contains(node.Sensor);
             item.Click += delegate(object obj, EventArgs args) {
               if (item.Checked) {
@@ -726,14 +733,14 @@ namespace OpenHardwareMonitor.GUI {
           if (node.Sensor.Control != null) {
             treeContextMenu.MenuItems.Add(new MenuItem("-"));
             IControl control = node.Sensor.Control;
-            MenuItem controlItem = new MenuItem("Control");
-            MenuItem defaultItem = new MenuItem("Default");
+            MenuItem controlItem = new MenuItem("控制");
+            MenuItem defaultItem = new MenuItem("默认");
             defaultItem.Checked = control.ControlMode == ControlMode.Default;
             controlItem.MenuItems.Add(defaultItem);
             defaultItem.Click += delegate(object obj, EventArgs args) {
               control.SetDefault();
             };
-            MenuItem manualItem = new MenuItem("Manual");
+            MenuItem manualItem = new MenuItem("选择");
             controlItem.MenuItems.Add(manualItem);
             manualItem.Checked = control.ControlMode == ControlMode.Software;
             for (int i = 0; i <= 100; i += 5) {
@@ -761,7 +768,7 @@ namespace OpenHardwareMonitor.GUI {
           treeContextMenu.MenuItems.Clear();
 
           if (nodeTextBoxText.EditEnabled) {
-            MenuItem item = new MenuItem("Rename");
+            MenuItem item = new MenuItem("重命名");
             item.Click += delegate(object obj, EventArgs args) {
               nodeTextBoxText.BeginEdit();
             };
@@ -785,7 +792,7 @@ namespace OpenHardwareMonitor.GUI {
     private void SysTrayHideShow() {
       Visible = !Visible;
       if (Visible)
-        Activate();    
+        Activate();
     }
 
     protected override void WndProc(ref Message m) {
@@ -793,7 +800,7 @@ namespace OpenHardwareMonitor.GUI {
       const int SC_MINIMIZE = 0xF020;
       const int SC_CLOSE = 0xF060;
 
-      if (minimizeToTray.Value && 
+      if (minimizeToTray.Value &&
         m.Msg == WM_SYSCOMMAND && m.WParam.ToInt64() == SC_MINIMIZE) {
         SysTrayHideShow();
       } else if (minimizeOnClose.Value &&
@@ -801,7 +808,7 @@ namespace OpenHardwareMonitor.GUI {
         /*
          * Apparently the user wants to minimize rather than close
          * Now we still need to check if we're going to the tray or not
-         * 
+         *
          * Note: the correct way to do this would be to send out SC_MINIMIZE,
          * but since the code here is so simple,
          * that would just be a waste of time.
@@ -810,7 +817,7 @@ namespace OpenHardwareMonitor.GUI {
           SysTrayHideShow();
         else
           WindowState = FormWindowState.Minimized;
-      } else {      
+      } else {
         base.WndProc(ref m);
       }
     }
@@ -822,14 +829,14 @@ namespace OpenHardwareMonitor.GUI {
     private void ShowParameterForm(ISensor sensor) {
       ParameterForm form = new ParameterForm();
       form.Parameters = sensor.Parameters;
-      form.captionLabel.Text = sensor.Name;
+      form.captionLabel.Text = Translate.toChinese(sensor);
       form.ShowDialog();
     }
 
-    private void treeView_NodeMouseDoubleClick(object sender, 
+    private void treeView_NodeMouseDoubleClick(object sender,
       TreeNodeAdvMouseEventArgs e) {
       SensorNode node = e.Node.Tag as SensorNode;
-      if (node != null && node.Sensor != null && 
+      if (node != null && node.Sensor != null &&
         node.Sensor.Parameters.Length > 0) {
         ShowParameterForm(node.Sensor);
       }
@@ -847,11 +854,11 @@ namespace OpenHardwareMonitor.GUI {
       unitManager.TemperatureUnit = TemperatureUnit.Fahrenheit;
     }
 
-    private void sumbitReportMenuItem_Click(object sender, EventArgs e) 
+    private void sumbitReportMenuItem_Click(object sender, EventArgs e)
     {
       ReportForm form = new ReportForm();
       form.Report = computer.GetReport();
-      form.ShowDialog();      
+      form.ShowDialog();
     }
 
     private void resetMinMaxMenuItem_Click(object sender, EventArgs e) {
@@ -872,7 +879,7 @@ namespace OpenHardwareMonitor.GUI {
 
     private void resetClick(object sender, EventArgs e) {
       // disable the fallback MainIcon during reset, otherwise icon visibility
-      // might be lost 
+      // might be lost
       systemTray.IsMainIconEnabled = false;
       computer.Close();
       computer.Open();
@@ -882,10 +889,10 @@ namespace OpenHardwareMonitor.GUI {
 
     private void treeView_MouseMove(object sender, MouseEventArgs e) {
       selectionDragging = selectionDragging &
-        (e.Button & (MouseButtons.Left | MouseButtons.Right)) > 0; 
+        (e.Button & (MouseButtons.Left | MouseButtons.Right)) > 0;
 
       if (selectionDragging)
-        treeView.SelectedNode = treeView.GetNodeAt(e.Location);     
+        treeView.SelectedNode = treeView.GetNodeAt(e.Location);
     }
 
     private void treeView_MouseDown(object sender, MouseEventArgs e) {

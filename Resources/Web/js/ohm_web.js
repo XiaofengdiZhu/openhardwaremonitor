@@ -1,9 +1,9 @@
 /*
- 
+
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
- 
+
 	Copyright (C) 2012 Prince Samuel <prince.samuel@gmail.com>
 
 */
@@ -14,7 +14,7 @@ ko.bindingHandlers.treeTable = {
     options = ko.toJS(allBindingsAccessor().treeOptions || {});
 
     setTimeout(function() { $(element).treeTable(options); }, 0);
-  } 
+  }
 };
 
 var node = function(config, parent) {
@@ -54,7 +54,7 @@ $(function(){
         var result = []; //root node
 
         if (viewModel.Children) {
-          flattenChildren(viewModel.Children, result);   
+          flattenChildren(viewModel.Children, result);
         }
 
         return result;
@@ -106,11 +106,9 @@ $(function(){
         viewModel.stopAuto();
         viewModel.startAuto();
       }
-      $( "#lbl" ).text( ui.value + "s");
+      $("#lbl").text(ui.value + "\u79d2");
     }
   });
-  $( "#lbl" ).text( $( "#slider" ).slider( "value" ) + "s");
+  $("#lbl").text($("#slider").slider("value") + "\u79d2");
 
 });
-
-

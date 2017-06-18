@@ -72,7 +72,44 @@ namespace OpenHardwareMonitor.GUI {
         window.Opacity = value;
       }
     }
-
+    private byte hardwareBackgroundOpacity = 0;
+    public byte HardwareBackgroundOpacity {
+      get {
+        return hardwareBackgroundOpacity;
+      }
+      set {
+        hardwareBackgroundOpacity = value;
+      }
+    }
+    private byte progressOpacity = 0;
+    public byte ProgressOpacity {
+      get {
+        return progressOpacity;
+      }
+      set {
+        progressOpacity = value;
+      }
+    }
+    private byte backgroundImageOpacity = 0;
+    public byte BackgroundImageOpacity
+    {
+      get {
+        return backgroundImageOpacity;
+      }
+      set {
+        backgroundImageOpacity = value;
+      }
+    }
+    private byte backgroundImageCoverOpacity = 0;
+    public byte BackgroundImageCoverOpacity
+    {
+      get {
+        return backgroundImageCoverOpacity;
+      }
+      set {
+        backgroundImageCoverOpacity = value;
+      }
+    }
     public bool LockPositionAndSize {
       get {
         return window.LockPositionAndSize;
@@ -88,6 +125,15 @@ namespace OpenHardwareMonitor.GUI {
       }
       set {
         window.AlwaysOnTop = value;
+      }
+    }
+    private bool backgroundImageCoverColor = false;
+    public bool BackgroundImageCoverColor {
+      get {
+        return backgroundImageCoverColor;
+      }
+      set {
+        backgroundImageCoverColor = value;
       }
     }
 

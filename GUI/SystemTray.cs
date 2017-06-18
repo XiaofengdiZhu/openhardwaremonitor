@@ -37,13 +37,13 @@ namespace OpenHardwareMonitor.GUI {
       this.mainIcon = new NotifyIconAdv();
 
       ContextMenu contextMenu = new ContextMenu();
-      MenuItem hideShowItem = new MenuItem("Hide/Show");
+      MenuItem hideShowItem = new MenuItem("显示/隐藏");
       hideShowItem.Click += delegate(object obj, EventArgs args) {
         SendHideShowCommand();
       };
       contextMenu.MenuItems.Add(hideShowItem);
       contextMenu.MenuItems.Add(new MenuItem("-"));      
-      MenuItem exitItem = new MenuItem("Exit");
+      MenuItem exitItem = new MenuItem("退出");
       exitItem.Click += delegate(object obj, EventArgs args) {
         SendExitCommand();
       };

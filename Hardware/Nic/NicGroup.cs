@@ -1,0 +1,50 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Net.NetworkInformation;
+using System.Text;
+
+namespace OpenHardwareMonitor.Hardware.Nic
+{
+    internal class NicGroup : IGroup
+    {
+
+        private List<Hardware> hardware = new List<Hardware>();
+        private NetworkInterface[] nicArr;
+
+        public NicGroup(ISettings settings)
+        {
+            int p = (int)Environment.OSVersion.Platform;
+            if ((p == 4) || (p == 128))
+            {
+                hardware = new List<Hardware>();
+                return;
+            }
+            nicArr = NetworkInterface.GetAllNetworkInterfaces();
+            for (int i = 0; i < nicArr.Length; i++)
+                hardware.Add(new Nic(nicArr[i].Name,settings, nicArr[i],i));
+        }
+
+        public string GetReport()
+        {
+            return null;
+        }
+
+        public IHardware[] Hardware
+        {
+            get
+            {
+                return hardware.ToArray();
+            }
+        }
+        
+        public void Close()
+        {
+            foreach (Hardware nic in hardware)
+                nic.Close();
+        }
+        public static string Format(float value)
+        {
+            return value.ToString();
+        }
+    }
+}

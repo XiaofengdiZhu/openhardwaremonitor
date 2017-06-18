@@ -6,7 +6,7 @@
 
 <html>
   <head>
-    <title>Open Hardware Monitor - Web Version</title>
+    <title>Open Hardware Monitor - 网页版</title>
     <script type='text/javascript' src='js/jquery-1.7.2.min.js'></script>
     <script type='text/javascript' src='js/jquery.tmpl.min.js'></script>
     <script type='text/javascript' src='js/knockout-2.1.0.min.js'></script>
@@ -38,15 +38,15 @@
     <div class="header">
 
       <span id="toolbar" class="ui-widget-header ui-corner-all">
-        <button id="refresh" data-bind="click: update">Refresh</button>
-        <input type="checkbox" id="auto_refresh" data-bind="checked: auto_refresh"/><label for="auto_refresh">Auto Refresh</label>
+        <button id="refresh" data-bind="click: update">刷新</button>
+        <input type="checkbox" id="auto_refresh" data-bind="checked: auto_refresh"/><label for="auto_refresh">自动刷新</label>
         &nbsp;<div id="slider"></div>&nbsp;&nbsp;&nbsp;&nbsp;<span for="auto_refresh" id="lbl"></span>
       </span>
     </div>
 
     <div class="main">
       <table data-bind="treeTable: flattened, treeOptions: { initialState: 'expanded', clickableNodeNames: true } ">
-        <thead><td>Sensor</td><td>Min</td><td>Value</td><td>Max</td>
+        <thead><td>传感器</td><td>最小值</td><td>当前值</td><td>最大值</td>
           <tbody data-bind="foreach: flattened">
             <tr data-bind="attr: { 'id': 'node-' + id(), 'class': parent.id()?'child-of-node-' + parent.id():'' }">
               <td data-bind="html: '<img src=' + ImageURL() + ' />&nbsp; ' + Text()"></td>

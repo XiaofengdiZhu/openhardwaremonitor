@@ -101,7 +101,7 @@ namespace OpenHardwareMonitor.GUI {
       if (e.ColumnIndex == 2 &&
         !float.TryParse(e.FormattedValue.ToString(), out value)) {
         dataGridView.Rows[e.RowIndex].Cells[0].ErrorText = 
-          "Invalid value";
+          "无效值";
         e.Cancel = true;
       }
     }

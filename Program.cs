@@ -47,8 +47,8 @@ namespace OpenHardwareMonitor {
         Path.DirectorySeparatorChar;
 
       if (!File.Exists(path + fileName)) {
-        MessageBox.Show("The following file could not be found: " + fileName + 
-          "\nPlease extract all files from the archive.", "Error",
+        MessageBox.Show("以下文件没有找到: " + fileName + 
+          "\n请从压缩包中取出所有文件。", "错误",
            MessageBoxButtons.OK, MessageBoxIcon.Error);
         return false;
       }

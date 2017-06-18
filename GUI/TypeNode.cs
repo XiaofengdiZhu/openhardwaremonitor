@@ -16,6 +16,7 @@ namespace OpenHardwareMonitor.GUI {
   public class TypeNode : Node {
 
     private SensorType sensorType;
+    private string text;
 
     public TypeNode(SensorType sensorType) : base() {
       this.sensorType = sensorType;
@@ -69,6 +70,10 @@ namespace OpenHardwareMonitor.GUI {
           this.Image = Utilities.EmbeddedResources.GetImage("factor.png");
           this.Text = "Factors";
           break;
+        case SensorType.InternetSpeed:
+          this.Image = Utilities.EmbeddedResources.GetImage("internetspeed.png");
+          this.Text = "Internet Speed";
+          break;
       }
 
       NodeAdded += new NodeEventHandler(TypeNode_NodeAdded);
@@ -97,5 +102,15 @@ namespace OpenHardwareMonitor.GUI {
     public SensorType SensorType {
       get { return sensorType; }
     }
-  }
+        public override string Text
+        {
+            get { return Translate.toChinese(text); }
+            set {
+                if (text != value)
+                {
+                    text = value;
+                }
+            }
+        }
+    }
 }
