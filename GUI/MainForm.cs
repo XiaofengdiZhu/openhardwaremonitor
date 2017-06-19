@@ -70,6 +70,8 @@ namespace OpenHardwareMonitor.GUI {
     private UserOption logSensors;
     private UserRadioGroup loggingInterval;
     private Logger logger;
+        
+    private UserRadioGroup updateInterval;
 
     private bool selectionDragging = false;
 
@@ -314,6 +316,18 @@ namespace OpenHardwareMonitor.GUI {
           case 10: logger.LoggingInterval = new TimeSpan(1, 0, 0); break;
           case 11: logger.LoggingInterval = new TimeSpan(2, 0, 0); break;
           case 12: logger.LoggingInterval = new TimeSpan(6, 0, 0); break;
+        }
+      };
+      updateInterval = new UserRadioGroup("updateInterval", 2,
+        new[] { UpdateIntervalMenuItem0_2, UpdateIntervalMenuItem0_5, UpdateIntervalMenuItem1_0, UpdateIntervalMenuItem2_0, UpdateIntervalMenuItem5_0},
+        settings);
+      updateInterval.Changed += (sender, e) => {
+        switch (updateInterval.Value) {
+          case 0: this.timer.Interval = 200; break;
+          case 1: this.timer.Interval = 500; break;
+          case 2: this.timer.Interval = 1000; break;
+          case 3: this.timer.Interval = 2000; break;
+          case 4: this.timer.Interval = 5000; break;
         }
       };
 
