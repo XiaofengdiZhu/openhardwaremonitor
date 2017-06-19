@@ -568,8 +568,8 @@ namespace OpenHardwareMonitor.GUI {
       g.DrawImageUnscaled(background, 0, 0);
       if(BackgroundImageCoverOpacity!=0) g.FillRectangle(new SolidBrush(Color.FromArgb(BackgroundImageCoverOpacity, BackgroundImageCoverColor?Color.White:Color.Black)), new Rectangle(0, 0, w, h));
     }
-
-    private void DrawProgress(Graphics g, float x, float y, 
+        
+    /*private void DrawProgress(Graphics g, float x, float y, 
       float width, float height, float progress) 
     {
       g.DrawImage(barBack, 
@@ -581,7 +581,7 @@ namespace OpenHardwareMonitor.GUI {
         new RectangleF(x, y, width * progress, height),
         new RectangleF(0, 0, progress * barFore.Width, barFore.Height),
         GraphicsUnit.Pixel);
-    }
+    }*/
 
     protected override void OnPaint(PaintEventArgs e) {
       Graphics g = e.Graphics;
@@ -606,7 +606,7 @@ namespace OpenHardwareMonitor.GUI {
           if (y > topMargin)
             y += hardwareLineHeight - sensorLineHeight;
           x = leftBorder + 1;
-          if(HardwareBackgroundOpacity!=0) g.FillRectangle(new SolidBrush(Color.FromArgb(HardwareBackgroundOpacity, 0, 0, 0)), new Rectangle(0, y - 6, w, hardwareLineHeight+5));
+          if(HardwareBackgroundOpacity!=0) g.FillRectangle(new SolidBrush(Color.FromArgb(HardwareBackgroundOpacity, 0, 0, 0)), new Rectangle(0, y - 8, w, hardwareLineHeight+5));
           g.DrawImage(HardwareTypeImage.Instance.GetImage(pair.Key.HardwareType),
             new Rectangle(x, y + 1, iconSize, iconSize));
           x += iconSize + 1;
@@ -703,7 +703,7 @@ namespace OpenHardwareMonitor.GUI {
               0.6f * sensorLineHeight, 0.01f * sensor.Value.Value);*/
             if(ProgressOpacity!=0){
               int value30 = (int)(sensor.Value * 10f) * 3;
-              g.FillRectangle(new SolidBrush(Color.FromArgb(ProgressOpacity, progressColor[value30], progressColor[value30 + 1], progressColor[value30 + 2])), new Rectangle(0, y - 1, (int)(w * 0.01f * sensor.Value.Value), sensorLineHeight+1));
+              g.FillRectangle(new SolidBrush(Color.FromArgb(ProgressOpacity, progressColor[value30], progressColor[value30 + 1], progressColor[value30 + 2])), new Rectangle(0, y - 3, (int)(w * 0.01f * sensor.Value.Value), sensorLineHeight+1));
             }
             string formattedProgress = sensor.Value.Value.ToString("#0.0") + "%";
             g.DrawString(formattedProgress, smallFont, darkWhite, new RectangleF(-1, y - 1, w - rightMargin + 3, 0),alignRightStringFormat);
