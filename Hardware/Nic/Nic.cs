@@ -9,10 +9,8 @@
 */
 
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Net.NetworkInformation;
-using System.Runtime.InteropServices;
 
 namespace OpenHardwareMonitor.Hardware.Nic
 {
@@ -25,14 +23,15 @@ namespace OpenHardwareMonitor.Hardware.Nic
         private Sensor downloadSpeed;
         private Sensor networkUtilization;
         private NetworkInterface nic;
+        private DateTime latesTime;
 
         private long bytesUploaded;
         private long bytesDownloaded;
 
-        public Nic(string name, ISettings settings, NetworkInterface NIC, int index)
+        public Nic(string name, ISettings settings, int index, NicGroup nicGroup)
           : base(name, new Identifier("NIC",index.ToString(CultureInfo.InvariantCulture)), settings)
         {
-            nic = NIC;
+            nic = nicGroup.NicArr[index];
             connectionSpeed = new Sensor("Connection Speed", 0, SensorType.InternetSpeed, this,
               settings);
             ActivateSensor(connectionSpeed);
@@ -53,7 +52,7 @@ namespace OpenHardwareMonitor.Hardware.Nic
             ActivateSensor(networkUtilization);
             bytesUploaded = nic.GetIPv4Statistics().BytesSent;
             bytesDownloaded = nic.GetIPv4Statistics().BytesReceived;
-            time = DateTime.Now;
+            latesTime = DateTime.Now;
         }
 
         public override HardwareType HardwareType
@@ -63,12 +62,11 @@ namespace OpenHardwareMonitor.Hardware.Nic
                 return HardwareType.NIC;
             }
         }
-        private DateTime time;
         public override void Update()
         {
             DateTime newTime = DateTime.Now;
-            float dt = (float)(newTime - time).TotalSeconds;
-            time = newTime;
+            float dt = (float)(newTime - latesTime).TotalSeconds;
+            latesTime = newTime;
             IPv4InterfaceStatistics interfaceStats = nic.GetIPv4Statistics();
             connectionSpeed.Value = nic.Speed;
             uploadSpeed.Value = (float)(interfaceStats.BytesSent - bytesUploaded) / dt;

@@ -21,7 +21,7 @@ namespace OpenHardwareMonitor.Hardware.Nic
             }
             nicArr = NetworkInterface.GetAllNetworkInterfaces();
             for (int i = 0; i < nicArr.Length; i++)
-                hardware.Add(new Nic(nicArr[i].Name,settings, nicArr[i],i));
+                hardware.Add(new Nic(nicArr[i].Name, settings, i, this));
         }
 
         public string GetReport()
@@ -36,15 +36,21 @@ namespace OpenHardwareMonitor.Hardware.Nic
                 return hardware.ToArray();
             }
         }
-        
+        public NetworkInterface[] NicArr
+        {
+            get
+            {
+                return nicArr;
+            }
+            set
+            {
+                nicArr = value;
+            }
+        }
         public void Close()
         {
             foreach (Hardware nic in hardware)
                 nic.Close();
-        }
-        public static string Format(float value)
-        {
-            return value.ToString();
         }
     }
 }
