@@ -36,7 +36,7 @@ namespace OpenHardwareMonitor.Hardware.Nic
         private long bytesDownloaded;
         private long totalBytesDownloaded;
         private long totalBytesUploaded;
-        private bool TotalFlowUpdated = false;
+        private bool shouldTotalFlowUpdate = true;
 
         public Nic(string name, ISettings Settings, int index, NicGroup nicGroup)
           : base(name, new Identifier("NIC",index.ToString(CultureInfo.InvariantCulture)), Settings)
@@ -55,13 +55,9 @@ namespace OpenHardwareMonitor.Hardware.Nic
             }
             presentBootTime = DateTime.Now.AddMilliseconds(-(double)Environment.TickCount);
             string lastBootTime = settings.GetValue("lastBootTime" + nic.Name, "-1");
-            if(lastBootTime != string.Format("{0:g}", presentBootTime))
+            if(lastBootTime == string.Format("{0:g}", presentBootTime))
             {
-                settings.SetValue("lastBootTime" + nic.Name, string.Format("{0:g}", presentBootTime));
-            }
-            else
-            {
-                TotalFlowUpdated = true;
+                    shouldTotalFlowUpdate = false;
             }
             connectionSpeed = new Sensor("Connection Speed", 0, SensorType.InternetSpeed, this,
               settings);
@@ -116,7 +112,7 @@ namespace OpenHardwareMonitor.Hardware.Nic
             bytesDownloaded = interfaceStats.BytesReceived;
             dataUploaded.Value = ((float)bytesUploaded / 1073741824);
             dataDownloaded.Value = ((float)bytesDownloaded / 1073741824);
-            if (!TotalFlowUpdated)
+            if (shouldTotalFlowUpdate)
             {
                 long totalDownloadedBeforeLastBoot = Convert.ToInt64(settings.GetValue("TotalDownloadedBeforeNextShutdown"+nic.Name, "-1"));
                 long totalUploadedBeforeLastBoot = Convert.ToInt64(settings.GetValue("TotalUploadedBeforeNextShutdown" + nic.Name, "-1"));
@@ -130,7 +126,8 @@ namespace OpenHardwareMonitor.Hardware.Nic
                     settings.SetValue("TotalDownloadedBeforeLastBoot" + nic.Name, (totalBytesDownloaded + totalDownloadedBeforeLastBoot).ToString());
                     settings.SetValue("TotalUploadedBeforeLastBoot" + nic.Name, (totalBytesUploaded + totalUploadedBeforeLastBoot).ToString());
                 }
-                TotalFlowUpdated = true;
+                settings.SetValue("lastBootTime" + nic.Name, string.Format("{0:g}", presentBootTime));
+                shouldTotalFlowUpdate = false;
             }
             settings.SetValue("TotalDownloadedBeforeNextShutdown"+nic.Name, bytesDownloaded.ToString());
             settings.SetValue("TotalUploadedBeforeNextShutdown" + nic.Name, bytesUploaded.ToString());

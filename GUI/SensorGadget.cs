@@ -692,7 +692,7 @@ namespace OpenHardwareMonitor.GUI {
             Brush sensorColor = darkWhite;
             if (sensor.SensorType == SensorType.Temperature && sensor.Value.HasValue)
             {
-              int value30 = Clamp((int)((sensor.Value - 25) * 14.2857f) * 3, 0, 1000);
+              int value30 = Clamp((int)((sensor.Value - 25) * 14.2857f) * 3, 0, 3000);
               sensorColor = new SolidBrush(Color.FromArgb(progressColor[value30], progressColor[value30 + 1], progressColor[value30 + 2]));
             }
             g.DrawString(formatted, smallFont, sensorColor,
