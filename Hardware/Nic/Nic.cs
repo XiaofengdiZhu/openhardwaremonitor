@@ -9,6 +9,7 @@
 */
 
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Net.NetworkInformation;
 
@@ -16,22 +17,53 @@ namespace OpenHardwareMonitor.Hardware.Nic
 {
     internal class Nic : Hardware
     {
+        private ISettings settings;
         private Sensor connectionSpeed;
         private Sensor dataUploaded;
         private Sensor dataDownloaded;
         private Sensor uploadSpeed;
         private Sensor downloadSpeed;
         private Sensor networkUtilization;
+        private Sensor totalDataDownloaded;
+        private Sensor totalDataUploaded;
+        private Sensor totalDataFlowed;
         private NetworkInterface nic;
+        private int nicIndex;
         private DateTime latesTime;
+        private DateTime presentBootTime;
 
         private long bytesUploaded;
         private long bytesDownloaded;
+        private long totalBytesDownloaded;
+        private long totalBytesUploaded;
+        private bool TotalFlowUpdated = false;
 
-        public Nic(string name, ISettings settings, int index, NicGroup nicGroup)
-          : base(name, new Identifier("NIC",index.ToString(CultureInfo.InvariantCulture)), settings)
+        public Nic(string name, ISettings Settings, int index, NicGroup nicGroup)
+          : base(name, new Identifier("NIC",index.ToString(CultureInfo.InvariantCulture)), Settings)
         {
+            settings = Settings;
+            nicIndex = index;
             nic = nicGroup.NicArr[index];
+            totalBytesDownloaded = Convert.ToInt64(settings.GetValue("TotalDownloadedBeforeLastBoot"+nic.Name, "-1"));
+            totalBytesUploaded = Convert.ToInt64(settings.GetValue("TotalUploadedBeforeLastBoot" + nic.Name, "-1"));
+            if (totalBytesDownloaded == -1)
+            {
+                settings.SetValue("TotalDownloadedBeforeLastBoot"+nic.Name, "0");
+                settings.SetValue("TotalUploadedBeforeLastBoot" + nic.Name, "0");
+                totalBytesDownloaded = 0;
+                totalBytesUploaded = 0;
+            }
+            presentBootTime = DateTime.Now.AddMilliseconds(-(double)Environment.TickCount);
+            Debug.WriteLine(string.Format("{0:g}", presentBootTime));
+            string lastBootTime = settings.GetValue("lastBootTime" + nic.Name, "-1");
+            if(lastBootTime != string.Format("{0:g}", presentBootTime))
+            {
+                settings.SetValue("lastBootTime" + nic.Name, string.Format("{0:g}", presentBootTime));
+            }
+            else
+            {
+                TotalFlowUpdated = true;
+            }
             connectionSpeed = new Sensor("Connection Speed", 0, SensorType.InternetSpeed, this,
               settings);
             ActivateSensor(connectionSpeed);
@@ -41,10 +73,19 @@ namespace OpenHardwareMonitor.Hardware.Nic
             dataDownloaded = new Sensor("Data Downloaded", 3, SensorType.Data, this,
               settings);
             ActivateSensor(dataDownloaded);
-            uploadSpeed = new Sensor("Upload Speed", 4, SensorType.InternetSpeed, this,
+            totalDataDownloaded = new Sensor("Total Data Downloaded in Static", 5, SensorType.Data, this,
+              settings);
+            ActivateSensor(totalDataDownloaded);
+            totalDataUploaded = new Sensor("Total Data Uploaded in Static", 4, SensorType.Data, this,
+              settings);
+            ActivateSensor(totalDataUploaded);
+            totalDataFlowed = new Sensor("Total Data Flowed in Static", 6, SensorType.Data, this,
+              settings);
+            ActivateSensor(totalDataFlowed);
+            uploadSpeed = new Sensor("Upload Speed", 7, SensorType.InternetSpeed, this,
               settings);
             ActivateSensor(uploadSpeed);
-            downloadSpeed = new Sensor("Download Speed", 5, SensorType.InternetSpeed, this,
+            downloadSpeed = new Sensor("Download Speed", 8, SensorType.InternetSpeed, this,
               settings);
             ActivateSensor(downloadSpeed);
             networkUtilization = new Sensor("Network Utilization", 1, SensorType.Load, this,
@@ -76,6 +117,27 @@ namespace OpenHardwareMonitor.Hardware.Nic
             bytesDownloaded = interfaceStats.BytesReceived;
             dataUploaded.Value = ((float)bytesUploaded / 1073741824);
             dataDownloaded.Value = ((float)bytesDownloaded / 1073741824);
+            if (!TotalFlowUpdated)
+            {
+                long totalDownloadedBeforeLastBoot = Convert.ToInt64(settings.GetValue("TotalDownloadedBeforeNextShutdown"+nic.Name, "-1"));
+                long totalUploadedBeforeLastBoot = Convert.ToInt64(settings.GetValue("TotalUploadedBeforeNextShutdown" + nic.Name, "-1"));
+                if (totalDownloadedBeforeLastBoot == -1)
+                {
+                    settings.SetValue("TotalDownloadedBeforeNextShutdown" + nic.Name, "0");
+                    settings.SetValue("TotalUploadedBeforeNextShutdown" + nic.Name, "0");
+                }
+                else
+                {
+                    settings.SetValue("TotalDownloadedBeforeLastBoot" + nic.Name, (totalBytesDownloaded + totalDownloadedBeforeLastBoot).ToString());
+                    settings.SetValue("TotalUploadedBeforeLastBoot" + nic.Name, (totalBytesUploaded + totalUploadedBeforeLastBoot).ToString());
+                }
+                TotalFlowUpdated = true;
+            }
+            settings.SetValue("TotalDownloadedBeforeNextShutdown"+nic.Name, bytesDownloaded.ToString());
+            settings.SetValue("TotalUploadedBeforeNextShutdown" + nic.Name, bytesUploaded.ToString());
+            totalDataDownloaded.Value = ((float)(totalBytesDownloaded + bytesDownloaded) / 1073741824);
+            totalDataUploaded.Value = ((float)(totalBytesUploaded + bytesUploaded) / 1073741824);
+            totalDataFlowed.Value = totalDataDownloaded.Value + totalDataUploaded.Value;
         }
     }
 }

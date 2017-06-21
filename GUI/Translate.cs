@@ -88,6 +88,9 @@ namespace OpenHardwareMonitor.GUI
                         case "Total Bytes Written": result = "总写入量"; break;
                         case "Data Uploaded": result = "已上传"; break;
                         case "Data Downloaded": result = "已下载"; break;
+                        case "Total Data Downloaded in Static": result = "历史总下载"; break;
+                        case "Total Data Uploaded in Static": result = "历史总上传"; break;
+                        case "Total Data Flowed in Static": result = "历史总流量"; break;
                     }
                     break;
                 case SensorType.SmallData:
