@@ -576,6 +576,7 @@ namespace OpenHardwareMonitor.GUI {
     }
 
     private int delayCount = 0;
+    private int delaySaveConfigCount = 0;
     private void timer_Tick(object sender, EventArgs e) {
       computer.Accept(updateVisitor);
       treeView.Invalidate();
@@ -586,8 +587,10 @@ namespace OpenHardwareMonitor.GUI {
 
       if (wmiProvider != null)
         wmiProvider.Update();
-
-
+      if(++delaySaveConfigCount>100){
+        SaveConfiguration();
+        delaySaveConfigCount = 0;
+      }
       if (logSensors != null && logSensors.Value && delayCount >= 4)
         logger.Log();
 
