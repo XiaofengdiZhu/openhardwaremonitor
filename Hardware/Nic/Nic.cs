@@ -54,7 +54,6 @@ namespace OpenHardwareMonitor.Hardware.Nic
                 totalBytesUploaded = 0;
             }
             presentBootTime = DateTime.Now.AddMilliseconds(-(double)Environment.TickCount);
-            Debug.WriteLine(string.Format("{0:g}", presentBootTime));
             string lastBootTime = settings.GetValue("lastBootTime" + nic.Name, "-1");
             if(lastBootTime != string.Format("{0:g}", presentBootTime))
             {
@@ -112,7 +111,7 @@ namespace OpenHardwareMonitor.Hardware.Nic
             connectionSpeed.Value = nic.Speed;
             uploadSpeed.Value = (float)(interfaceStats.BytesSent - bytesUploaded) / dt;
             downloadSpeed.Value = (float)(interfaceStats.BytesReceived - bytesDownloaded) / dt;
-            networkUtilization.Value = Math.Max((float)uploadSpeed.Value, (float)downloadSpeed.Value)/ connectionSpeed.Value*800;
+            networkUtilization.Value = Clamp(Math.Max((float)uploadSpeed.Value, (float)downloadSpeed.Value) * 800 / (float)connectionSpeed.Value,0,100);
             bytesUploaded = interfaceStats.BytesSent;
             bytesDownloaded = interfaceStats.BytesReceived;
             dataUploaded.Value = ((float)bytesUploaded / 1073741824);
@@ -138,6 +137,11 @@ namespace OpenHardwareMonitor.Hardware.Nic
             totalDataDownloaded.Value = ((float)(totalBytesDownloaded + bytesDownloaded) / 1073741824);
             totalDataUploaded.Value = ((float)(totalBytesUploaded + bytesUploaded) / 1073741824);
             totalDataFlowed.Value = totalDataDownloaded.Value + totalDataUploaded.Value;
+        }
+
+        private float Clamp(float value, float min, float max)
+        {
+            if (value < min) return min; else if (value > max) return max; else return value;
         }
     }
 }

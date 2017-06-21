@@ -108,9 +108,9 @@ namespace OpenHardwareMonitor.Hardware {
 
       if (hddEnabled)
         Add(new HDD.HarddriveGroup(settings));
+      nicCount = NetworkInterface.GetAllNetworkInterfaces().Length;
       if (nicEnabled)
       {
-        nicCount = NetworkInterface.GetAllNetworkInterfaces().Length;
         Add(new Nic.NicGroup(settings));
       }
       open = true;
@@ -399,7 +399,7 @@ namespace OpenHardwareMonitor.Hardware {
         foreach (IHardware hardware in group.Hardware)
           hardware.Accept(visitor);
       int newNiccount = NetworkInterface.GetAllNetworkInterfaces().Length;
-      if (nicCount != newNiccount) {
+      if (NICEnabled && nicCount != newNiccount) {
         nicCount = newNiccount;
         NICEnabled = false;
         NICEnabled = true;
