@@ -105,16 +105,18 @@ namespace OpenHardwareMonitor.Hardware.Nic
             latesTime = newTime;
             IPv4InterfaceStatistics interfaceStats = nic.GetIPv4Statistics();
             connectionSpeed.Value = nic.Speed;
-            uploadSpeed.Value = (float)(interfaceStats.BytesSent - bytesUploaded) / dt;
-            downloadSpeed.Value = (float)(interfaceStats.BytesReceived - bytesDownloaded) / dt;
-            networkUtilization.Value = Clamp(Math.Max((float)uploadSpeed.Value, (float)downloadSpeed.Value) * 800 / (float)connectionSpeed.Value,0,100);
+            long dBytesUploaded = interfaceStats.BytesSent - bytesUploaded;
+            long dBytesDownloaded = interfaceStats.BytesReceived - bytesDownloaded;
+            uploadSpeed.Value = (float)dBytesUploaded / dt;
+            downloadSpeed.Value = (float)dBytesDownloaded / dt;
+            networkUtilization.Value = Clamp((Math.Max(dBytesUploaded, dBytesDownloaded) * 800 / nic.Speed) / dt, 0,100);
             bytesUploaded = interfaceStats.BytesSent;
             bytesDownloaded = interfaceStats.BytesReceived;
             dataUploaded.Value = ((float)bytesUploaded / 1073741824);
             dataDownloaded.Value = ((float)bytesDownloaded / 1073741824);
             if (shouldTotalFlowUpdate)
             {
-                long totalDownloadedBeforeLastBoot = Convert.ToInt64(settings.GetValue("TotalDownloadedBeforeNextShutdown"+nic.Name, "-1"));
+                long totalDownloadedBeforeLastBoot = Convert.ToInt64(settings.GetValue("TotalDownloadedBeforeNextShutdown" + nic.Name, "-1"));
                 long totalUploadedBeforeLastBoot = Convert.ToInt64(settings.GetValue("TotalUploadedBeforeNextShutdown" + nic.Name, "-1"));
                 if (totalDownloadedBeforeLastBoot == -1)
                 {
