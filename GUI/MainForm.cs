@@ -590,6 +590,8 @@ namespace OpenHardwareMonitor.GUI {
       if(++delaySaveConfigCount>100){
         SaveConfiguration();
         delaySaveConfigCount = 0;
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
       }
       if (logSensors != null && logSensors.Value && delayCount >= 4)
         logger.Log();
