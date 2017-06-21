@@ -663,34 +663,39 @@ namespace OpenHardwareMonitor.GUI {
                 formatted = string.Format("{0:F1} °F",
                   UnitManager.CelsiusToFahrenheit(sensor.Value));
               } else if(sensor.SensorType == SensorType.InternetSpeed){
-          string result = "-";
-          switch (sensor.Name){ 
-            case "Connection Speed": {
-              switch (sensor.Value){ 
-                case 100000000: result = "100Mbps";break;
-                case 1000000000: result = "1Gbps";break;
-                default: {
-                  if(sensor.Value < 1024) result = string.Format("{0:F0} bps", sensor.Value);
-                  else if(sensor.Value < 1048576) result = string.Format("{0:F1} Kbps", sensor.Value / 1024);
-                  else if(sensor.Value < 1073741824) result = string.Format("{0:F1} Mbps", sensor.Value / 1048576);
-                  else result = string.Format("{0:F1} Gbps", sensor.Value / 1073741824);
-                } break;
-              }
-            }break;
-            default:{
-              if(sensor.Value < 1048576) result = string.Format("{0:F1} KB/s", sensor.Value / 1024);
-              else result = string.Format("{0:F1} MB/s", sensor.Value / 1048576);
-            } break;
-          }
-          formatted =  result;
-        } else {
+                string result = "-";
+                switch (sensor.Name){ 
+                  case "Connection Speed": {
+                    switch (sensor.Value){ 
+                      case 100000000: result = "100Mbps";break;
+                      case 1000000000: result = "1Gbps";break;
+                      default: {
+                        if(sensor.Value < 1024) result = string.Format("{0:F0} bps", sensor.Value);
+                        else if(sensor.Value < 1048576) result = string.Format("{0:F1} Kbps", sensor.Value / 1024);
+                        else if(sensor.Value < 1073741824) result = string.Format("{0:F1} Mbps", sensor.Value / 1048576);
+                        else result = string.Format("{0:F1} Gbps", sensor.Value / 1073741824);
+                      } break;
+                    }
+                  }break;
+                  default:{
+                    if(sensor.Value < 1048576) result = string.Format("{0:F1} KB/s", sensor.Value / 1024);
+                    else result = string.Format("{0:F1} MB/s", sensor.Value / 1048576);
+                  } break;
+                }
+                formatted =  result;
+              } else {
                 formatted = string.Format(format, sensor.Value);
               }
             } else {
               formatted = "-";
             }
-
-            g.DrawString(formatted, smallFont, darkWhite,
+            Brush sensorColor = darkWhite;
+            if (sensor.SensorType == SensorType.Temperature && sensor.Value.HasValue)
+            {
+              int value30 = Clamp((int)((sensor.Value - 25) * 14.2857f) * 3, 0, 1000);
+              sensorColor = new SolidBrush(Color.FromArgb(progressColor[value30], progressColor[value30 + 1], progressColor[value30 + 2]));
+            }
+            g.DrawString(formatted, smallFont, sensorColor,
               new RectangleF(-1, y - 1, w - rightMargin + 3, 0),
               alignRightStringFormat);
 
@@ -752,6 +757,10 @@ namespace OpenHardwareMonitor.GUI {
             g.DrawImage(srcImage, new Rectangle(0, 0, srcImage.Width, srcImage.Height), 0, 0, srcImage.Width, srcImage.Height, GraphicsUnit.Pixel, attributes);
 
             return resultImage;
+        }
+        private int Clamp(int value, int min, int max)
+        {
+            if (value < min) return min; else if (value > max) return max; else return value;
         }
     }
 }
