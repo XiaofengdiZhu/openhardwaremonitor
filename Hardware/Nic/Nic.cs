@@ -125,8 +125,10 @@ namespace OpenHardwareMonitor.Hardware.Nic
                 }
                 else
                 {
-                    settings.SetValue("TotalDownloadedBeforeLastBoot" + nic.Name, (totalBytesDownloaded + totalDownloadedBeforeLastBoot).ToString());
-                    settings.SetValue("TotalUploadedBeforeLastBoot" + nic.Name, (totalBytesUploaded + totalUploadedBeforeLastBoot).ToString());
+                    totalBytesDownloaded += totalDownloadedBeforeLastBoot;
+                    totalBytesUploaded += totalUploadedBeforeLastBoot;
+                    settings.SetValue("TotalDownloadedBeforeLastBoot" + nic.Name, totalBytesDownloaded.ToString());
+                    settings.SetValue("TotalUploadedBeforeLastBoot" + nic.Name, totalBytesUploaded.ToString());
                 }
                 settings.SetValue("lastBootTime" + nic.Name, string.Format("{0:g}", presentBootTime));
                 shouldTotalFlowUpdate = false;
