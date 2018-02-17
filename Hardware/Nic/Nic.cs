@@ -32,6 +32,8 @@ namespace OpenHardwareMonitor.Hardware.Nic
         private DateTime latesTime;
         private DateTime presentBootTime;
 
+        private string nicName;
+        private NicGroup m_nicGroup;
         private long bytesUploaded;
         private long bytesDownloaded;
         private long totalBytesDownloaded;
@@ -43,7 +45,9 @@ namespace OpenHardwareMonitor.Hardware.Nic
         {
             settings = Settings;
             nicIndex = index;
+            m_nicGroup = nicGroup;
             nic = nicGroup.NicArr[index];
+            nicName = nic.Name;
             totalBytesDownloaded = Convert.ToInt64(settings.GetValue("TotalDownloadedBeforeLastBoot"+nic.Name, "-1"));
             totalBytesUploaded = Convert.ToInt64(settings.GetValue("TotalUploadedBeforeLastBoot" + nic.Name, "-1"));
             if (totalBytesDownloaded == -1)
@@ -100,6 +104,7 @@ namespace OpenHardwareMonitor.Hardware.Nic
         }
         public override void Update()
         {
+            if (nicName != nic.Name) m_nicGroup.Restart();
             DateTime newTime = DateTime.Now;
             float dt = (float)(newTime - latesTime).TotalSeconds;
             latesTime = newTime;
@@ -109,7 +114,7 @@ namespace OpenHardwareMonitor.Hardware.Nic
             long dBytesDownloaded = interfaceStats.BytesReceived - bytesDownloaded;
             uploadSpeed.Value = (float)dBytesUploaded / dt;
             downloadSpeed.Value = (float)dBytesDownloaded / dt;
-            networkUtilization.Value = Clamp((Math.Max(dBytesUploaded, dBytesDownloaded) * 800 / nic.Speed) / dt, 0,100);
+            networkUtilization.Value = Clamp((Math.Max(dBytesUploaded, dBytesDownloaded) * 800 / (nic.Speed>0?nic.Speed:1)) / dt, 0,100);
             bytesUploaded = interfaceStats.BytesSent;
             bytesDownloaded = interfaceStats.BytesReceived;
             dataUploaded.Value = ((float)bytesUploaded / 1073741824);
