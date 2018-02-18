@@ -95,6 +95,11 @@ namespace OpenHardwareMonitor.Hardware.Nic
             latesTime = DateTime.Now;
         }
 
+        public NetworkInterface GetInterface()
+        {
+            return nic;
+        }
+
         public override HardwareType HardwareType
         {
             get
