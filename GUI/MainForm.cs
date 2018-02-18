@@ -579,6 +579,9 @@ namespace OpenHardwareMonitor.GUI {
     private int delaySaveConfigCount = 0;
     private void timer_Tick(object sender, EventArgs e) {
       computer.Accept(updateVisitor);
+
+            ExApiClient.SyncToLive2DViewerEX(computer);
+
       treeView.Invalidate();
       plotPanel.InvalidatePlot();
       systemTray.Redraw();
