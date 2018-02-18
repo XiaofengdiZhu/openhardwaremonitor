@@ -10,9 +10,11 @@ namespace OpenHardwareMonitor.Hardware.Nic
 
         private List<Hardware> hardware = new List<Hardware>();
         private NetworkInterface[] nicArr;
+        private ISettings m_settings;
 
         public NicGroup(ISettings settings)
         {
+            m_settings = settings;
             int p = (int)Environment.OSVersion.Platform;
             if ((p == 4) || (p == 128))
             {
@@ -51,6 +53,13 @@ namespace OpenHardwareMonitor.Hardware.Nic
         {
             foreach (Hardware nic in hardware)
                 nic.Close();
+        }
+        public void Restart()
+        {
+            Close();
+            nicArr = NetworkInterface.GetAllNetworkInterfaces();
+            for (int i = 0; i < nicArr.Length; i++)
+                hardware.Add(new Nic(nicArr[i].Name, m_settings, i, this));
         }
     }
 }
