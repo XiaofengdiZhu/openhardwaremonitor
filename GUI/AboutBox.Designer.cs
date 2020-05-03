@@ -140,7 +140,7 @@ namespace OpenHardwareMonitor.GUI {
             this.linkLabel1.Size = new System.Drawing.Size(107, 12);
             this.linkLabel1.TabIndex = 10;
             this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "百度贴吧-销锋镝铸";
+            this.linkLabel1.Text = "销锋镝铸";
             this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel_LinkClicked);
             // 
             // AboutBox

@@ -33,7 +33,7 @@ namespace OpenHardwareMonitor.GUI {
 
       linkLabel1.Links.Remove(linkLabel1.Links[0]);
       linkLabel1.Links.Add(0, linkLabel1.Text.Length,
-        "http://tieba.baidu.com/home/main/?un=%E9%94%80%E9%94%8B%E9%95%9D%E9%93%B8&ie=utf-8");
+        "https://github.com/XiaofengdiZhu");
     }
 
     private void linkLabel_LinkClicked(object sender, 

@@ -1,13 +1,14 @@
 ﻿/*
-
+ 
   This Source Code Form is subject to the terms of the Mozilla Public
   License, v. 2.0. If a copy of the MPL was not distributed with this
   file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
-  Copyright (C) 2009-2016 Michael Möller <mmoeller@openhardwaremonitor.org>
-
+ 
+  Copyright (C) 2009-2020 Michael Möller <mmoeller@openhardwaremonitor.org>
+	
 */
 
+using OpenHardwareMonitor.Hardware;
 using System;
 using System.Drawing;
 using System.Collections.Generic;
@@ -16,20 +17,28 @@ using OpenHardwareMonitor.Utilities;
 
 namespace OpenHardwareMonitor.GUI {
   public class SensorNode : Node {
-
+    
     private ISensor sensor;
     private PersistentSettings settings;
     private UnitManager unitManager;
-    private string format;
+    private string fixedFormat;
     private bool plot = false;
     private Color? penColor = null;
 
     public string ValueToString(float? value) {
       if (value.HasValue) {
-        if (sensor.SensorType == SensorType.Temperature &&
-          unitManager.TemperatureUnit == TemperatureUnit.Fahrenheit) {
-          return string.Format("{0:F1} °F", value * 1.8 + 32);
-        } else if(sensor.SensorType == SensorType.InternetSpeed){
+        switch (sensor.SensorType) {
+          case SensorType.Temperature:
+            if (unitManager.TemperatureUnit == TemperatureUnit.Fahrenheit)
+              return string.Format("{0:F1} °F", value * 1.8 + 32);
+            else
+              return string.Format("{0:F1} °C", value);
+          case SensorType.Throughput:
+            if (value < 1)
+              return string.Format("{0:F1} KB/s", value * 0x400);
+            else
+              return string.Format("{0:F1} MB/s", value);  
+          case SensorType.InternetSpeed:
           string result = "-";
           switch (sensor.Name){ 
             case "Connection Speed": {
@@ -50,39 +59,40 @@ namespace OpenHardwareMonitor.GUI {
             } break;
           }
           return result;
-        } else {
-          return string.Format(format, value);
-        }
+          default:
+            return string.Format(fixedFormat, value);
+        }              
       } else
         return "-";
     }
 
-    public SensorNode(ISensor sensor, PersistentSettings settings,
-      UnitManager unitManager) : base() {
+
+    public SensorNode(ISensor sensor, PersistentSettings settings, 
+      UnitManager unitManager) : base() {      
       this.sensor = sensor;
       this.settings = settings;
       this.unitManager = unitManager;
       switch (sensor.SensorType) {
-        case SensorType.Voltage: format = "{0:F3} V"; break;
-        case SensorType.Clock: format = "{0:F0} MHz"; break;
-        case SensorType.Load: format = "{0:F1} %"; break;
-        case SensorType.Temperature: format = "{0:F1} °C"; break;
-        case SensorType.Fan: format = "{0:F0} RPM"; break;
-        case SensorType.Flow: format = "{0:F0} L/h"; break;
-        case SensorType.Control: format = "{0:F1} %"; break;
-        case SensorType.Level: format = "{0:F1} %"; break;
-        case SensorType.Power: format = "{0:F1} W"; break;
-        case SensorType.Data: format = "{0:F1} GB"; break;
-        case SensorType.SmallData: format = "{0:F1} MB"; break;
-        case SensorType.Factor: format = "{0:F3}"; break;
-        case SensorType.InternetSpeed: format = "{0:F1} B/s"; break;
+        case SensorType.Voltage: fixedFormat = "{0:F3} V"; break;
+        case SensorType.Clock: fixedFormat = "{0:F1} MHz"; break;
+        case SensorType.Load: fixedFormat = "{0:F1} %"; break;
+        case SensorType.Fan: fixedFormat = "{0:F0} RPM"; break;
+        case SensorType.Flow: fixedFormat = "{0:F0} L/h"; break;
+        case SensorType.Control: fixedFormat = "{0:F1} %"; break;
+        case SensorType.Level: fixedFormat = "{0:F1} %"; break;
+        case SensorType.Power: fixedFormat = "{0:F1} W"; break;
+        case SensorType.Data: fixedFormat = "{0:F1} GB"; break;
+        case SensorType.SmallData: fixedFormat = "{0:F1} MB"; break;
+        case SensorType.Factor: fixedFormat = "{0:F3}"; break;
+        case SensorType.InternetSpeed: fixedFormat = "{0:F1} B/s"; break;
+        default: fixedFormat = ""; break;
       }
 
-      bool hidden = settings.GetValue(new Identifier(sensor.Identifier,
+      bool hidden = settings.GetValue(new Identifier(sensor.Identifier, 
         "hidden").ToString(), sensor.IsDefaultHidden);
       base.IsVisible = !hidden;
 
-      this.Plot = settings.GetValue(new Identifier(sensor.Identifier,
+      this.Plot = settings.GetValue(new Identifier(sensor.Identifier, 
         "plot").ToString(), false);
 
       string id = new Identifier(sensor.Identifier, "penColor").ToString();
@@ -97,7 +107,7 @@ namespace OpenHardwareMonitor.GUI {
 
     public override bool IsVisible {
       get { return base.IsVisible; }
-      set {
+      set { 
         base.IsVisible = value;
         settings.SetValue(new Identifier(sensor.Identifier,
           "hidden").ToString(), !value);
@@ -122,9 +132,9 @@ namespace OpenHardwareMonitor.GUI {
 
     public bool Plot {
       get { return plot; }
-      set {
+      set { 
         plot = value;
-        settings.SetValue(new Identifier(sensor.Identifier, "plot").ToString(),
+        settings.SetValue(new Identifier(sensor.Identifier, "plot").ToString(), 
           value);
         if (PlotSelectionChanged != null)
           PlotSelectionChanged(this, null);
@@ -150,11 +160,11 @@ namespace OpenHardwareMonitor.GUI {
     }
 
     public override bool Equals(System.Object obj) {
-      if (obj == null)
+      if (obj == null) 
         return false;
 
       SensorNode s = obj as SensorNode;
-      if (s == null)
+      if (s == null) 
         return false;
 
       return (sensor == s.sensor);

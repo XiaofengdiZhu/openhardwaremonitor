@@ -166,9 +166,9 @@ namespace OpenHardwareMonitor.GUI {
       contextMenu.MenuItems.Add(new MenuItem("-"));
       MenuItem lockItem = new MenuItem("锁定位置和大小");
       contextMenu.MenuItems.Add(lockItem);
+      contextMenu.MenuItems.Add(new MenuItem("-"));
       MenuItem alwaysOnTopItem = new MenuItem("保持前端显示");
       contextMenu.MenuItems.Add(alwaysOnTopItem);
-      contextMenu.MenuItems.Add(new MenuItem("-"));
       MenuItem opacityMenu = new MenuItem("总不透明度");
       contextMenu.MenuItems.Add(opacityMenu);
       Opacity = (byte)settings.GetValue("sensorGadget.Opacity", 255);      
@@ -635,9 +635,6 @@ namespace OpenHardwareMonitor.GUI {
                 case SensorType.Clock:
                   format = "{0:F0} MHz";
                   break;
-                case SensorType.Temperature:
-                  format = "{0:F1} °C";
-                  break;
                 case SensorType.Fan:
                   format = "{0:F0} RPM";
                   break;
@@ -650,19 +647,34 @@ namespace OpenHardwareMonitor.GUI {
                 case SensorType.Data:
                   format = "{0:F1} GB";
                   break;
-                case SensorType.SmallData:
-                  format = "{0:F0} MB";
-                  break;
                 case SensorType.Factor:
                   format = "{0:F3}";
                   break;
+                case SensorType.SmallData:
+                  format = "{0:F1} MB";
+                  break;
               }
 
-              if (sensor.SensorType == SensorType.Temperature &&
-                unitManager.TemperatureUnit == TemperatureUnit.Fahrenheit) {
-                formatted = string.Format("{0:F1} °F",
-                  UnitManager.CelsiusToFahrenheit(sensor.Value));
-              } else if(sensor.SensorType == SensorType.InternetSpeed){
+              switch (sensor.SensorType) {
+                case SensorType.Temperature:
+                  if (unitManager.TemperatureUnit == TemperatureUnit.Fahrenheit) 
+                  {
+                    formatted = string.Format("{0:F1} °F", 
+                      UnitManager.CelsiusToFahrenheit(sensor.Value));
+                  } else {
+                    formatted = string.Format("{0:F1} °C", sensor.Value);
+                  }
+                  break;
+                case SensorType.Throughput:
+                  if (sensor.Value < 1) {
+                    formatted =
+                      string.Format("{0:F1} KB/s", sensor.Value * 0x400);
+                  } else {
+                    formatted =
+                      string.Format("{0:F1} MB/s", sensor.Value);
+                  }
+                  break;
+                case SensorType.InternetSpeed:
                 string result = "-";
                 switch (sensor.Name){ 
                   case "Connection Speed": {
@@ -683,8 +695,10 @@ namespace OpenHardwareMonitor.GUI {
                   } break;
                 }
                 formatted =  result;
-              } else {
-                formatted = string.Format(format, sensor.Value);
+                break;
+                default:
+                  formatted = string.Format(format, sensor.Value);
+                  break;
               }
             } else {
               formatted = "-";
