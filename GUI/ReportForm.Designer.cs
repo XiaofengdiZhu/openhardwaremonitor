@@ -52,9 +52,10 @@ namespace OpenHardwareMonitor.GUI {
             // sendButton
             // 
             this.sendButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.sendButton.Location = new System.Drawing.Point(472, 579);
+            this.sendButton.Location = new System.Drawing.Point(1101, 1496);
+            this.sendButton.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
             this.sendButton.Name = "sendButton";
-            this.sendButton.Size = new System.Drawing.Size(75, 21);
+            this.sendButton.Size = new System.Drawing.Size(175, 54);
             this.sendButton.TabIndex = 2;
             this.sendButton.Text = "Send";
             this.sendButton.UseVisualStyleBackColor = true;
@@ -64,9 +65,10 @@ namespace OpenHardwareMonitor.GUI {
             // 
             this.exitButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.exitButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.exitButton.Location = new System.Drawing.Point(553, 579);
+            this.exitButton.Location = new System.Drawing.Point(1290, 1496);
+            this.exitButton.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
             this.exitButton.Name = "exitButton";
-            this.exitButton.Size = new System.Drawing.Size(75, 21);
+            this.exitButton.Size = new System.Drawing.Size(175, 54);
             this.exitButton.TabIndex = 3;
             this.exitButton.Text = "Cancel";
             this.exitButton.UseVisualStyleBackColor = true;
@@ -76,11 +78,12 @@ namespace OpenHardwareMonitor.GUI {
             this.commentTextBox.AcceptsReturn = true;
             this.commentTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.commentTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.commentTextBox.Location = new System.Drawing.Point(4, 4);
+            this.commentTextBox.Location = new System.Drawing.Point(9, 10);
+            this.commentTextBox.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
             this.commentTextBox.Multiline = true;
             this.commentTextBox.Name = "commentTextBox";
             this.commentTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.commentTextBox.Size = new System.Drawing.Size(609, 70);
+            this.commentTextBox.Size = new System.Drawing.Size(1422, 181);
             this.commentTextBox.TabIndex = 1;
             // 
             // label3
@@ -89,10 +92,10 @@ namespace OpenHardwareMonitor.GUI {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label3.AutoEllipsis = true;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(9, 36);
-            this.label3.Margin = new System.Windows.Forms.Padding(3, 11, 3, 7);
+            this.label3.Location = new System.Drawing.Point(21, 93);
+            this.label3.Margin = new System.Windows.Forms.Padding(7, 28, 7, 18);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(137, 12);
+            this.label3.Size = new System.Drawing.Size(278, 31);
             this.label3.TabIndex = 5;
             this.label3.Text = "下面是自动生成的报告：";
             // 
@@ -102,10 +105,10 @@ namespace OpenHardwareMonitor.GUI {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.AutoEllipsis = true;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 466);
-            this.label1.Margin = new System.Windows.Forms.Padding(3, 11, 3, 7);
+            this.label1.Location = new System.Drawing.Point(21, 1204);
+            this.label1.Margin = new System.Windows.Forms.Padding(7, 28, 7, 18);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(197, 12);
+            this.label1.Size = new System.Drawing.Size(398, 31);
             this.label1.TabIndex = 6;
             this.label1.Text = "你能添加补充信息到报告（可选）：";
             // 
@@ -116,11 +119,11 @@ namespace OpenHardwareMonitor.GUI {
             this.commentPanel.BackColor = System.Drawing.SystemColors.Window;
             this.commentPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.commentPanel.Controls.Add(this.commentTextBox);
-            this.commentPanel.Location = new System.Drawing.Point(12, 488);
-            this.commentPanel.Margin = new System.Windows.Forms.Padding(3, 3, 3, 7);
+            this.commentPanel.Location = new System.Drawing.Point(28, 1261);
+            this.commentPanel.Margin = new System.Windows.Forms.Padding(7, 8, 7, 18);
             this.commentPanel.Name = "commentPanel";
-            this.commentPanel.Padding = new System.Windows.Forms.Padding(4, 4, 1, 4);
-            this.commentPanel.Size = new System.Drawing.Size(616, 80);
+            this.commentPanel.Padding = new System.Windows.Forms.Padding(9, 10, 2, 10);
+            this.commentPanel.Size = new System.Drawing.Size(1435, 203);
             this.commentPanel.TabIndex = 1;
             this.commentPanel.TabStop = true;
             // 
@@ -133,10 +136,11 @@ namespace OpenHardwareMonitor.GUI {
             this.reportPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.reportPanel.Controls.Add(this.reportTextBox);
             this.reportPanel.Controls.Add(this.textBox1);
-            this.reportPanel.Location = new System.Drawing.Point(12, 58);
+            this.reportPanel.Location = new System.Drawing.Point(28, 150);
+            this.reportPanel.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
             this.reportPanel.Name = "reportPanel";
-            this.reportPanel.Padding = new System.Windows.Forms.Padding(4, 4, 1, 4);
-            this.reportPanel.Size = new System.Drawing.Size(616, 364);
+            this.reportPanel.Padding = new System.Windows.Forms.Padding(9, 10, 2, 10);
+            this.reportPanel.Size = new System.Drawing.Size(1435, 937);
             this.reportPanel.TabIndex = 8;
             // 
             // reportTextBox
@@ -144,12 +148,13 @@ namespace OpenHardwareMonitor.GUI {
             this.reportTextBox.BackColor = System.Drawing.SystemColors.Window;
             this.reportTextBox.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.reportTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.reportTextBox.Location = new System.Drawing.Point(4, 4);
+            this.reportTextBox.Location = new System.Drawing.Point(9, 10);
+            this.reportTextBox.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
             this.reportTextBox.Multiline = true;
             this.reportTextBox.Name = "reportTextBox";
             this.reportTextBox.ReadOnly = true;
             this.reportTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.reportTextBox.Size = new System.Drawing.Size(609, 354);
+            this.reportTextBox.Size = new System.Drawing.Size(1422, 915);
             this.reportTextBox.TabIndex = 9;
             this.reportTextBox.TabStop = false;
             // 
@@ -157,10 +162,11 @@ namespace OpenHardwareMonitor.GUI {
             // 
             this.textBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.textBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox1.Location = new System.Drawing.Point(4, 4);
+            this.textBox1.Location = new System.Drawing.Point(9, 10);
+            this.textBox1.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
             this.textBox1.Multiline = true;
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(609, 354);
+            this.textBox1.Size = new System.Drawing.Size(1422, 915);
             this.textBox1.TabIndex = 2;
             // 
             // label2
@@ -169,10 +175,10 @@ namespace OpenHardwareMonitor.GUI {
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label2.AutoEllipsis = true;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 439);
-            this.label2.Margin = new System.Windows.Forms.Padding(3, 11, 3, 7);
+            this.label2.Location = new System.Drawing.Point(21, 1134);
+            this.label2.Margin = new System.Windows.Forms.Padding(7, 28, 7, 18);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(137, 12);
+            this.label2.Size = new System.Drawing.Size(278, 31);
             this.label2.TabIndex = 9;
             this.label2.Text = "输入你的邮箱（可选）：";
             // 
@@ -181,27 +187,29 @@ namespace OpenHardwareMonitor.GUI {
             this.emailTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.emailTextBox.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.emailTextBox.Location = new System.Drawing.Point(152, 437);
+            this.emailTextBox.Location = new System.Drawing.Point(355, 1129);
+            this.emailTextBox.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
             this.emailTextBox.Name = "emailTextBox";
-            this.emailTextBox.Size = new System.Drawing.Size(476, 21);
+            this.emailTextBox.Size = new System.Drawing.Size(1108, 39);
             this.emailTextBox.TabIndex = 0;
             // 
             // titleLabel
             // 
             this.titleLabel.AutoSize = true;
-            this.titleLabel.Location = new System.Drawing.Point(9, 13);
+            this.titleLabel.Location = new System.Drawing.Point(21, 34);
+            this.titleLabel.Margin = new System.Windows.Forms.Padding(7, 0, 7, 0);
             this.titleLabel.Name = "titleLabel";
-            this.titleLabel.Size = new System.Drawing.Size(311, 12);
+            this.titleLabel.Size = new System.Drawing.Size(655, 31);
             this.titleLabel.TabIndex = 10;
             this.titleLabel.Text = "提交你的硬件信息报告来帮助改善Open Hardware Monitor";
             // 
             // ReportForm
             // 
             this.AcceptButton = this.sendButton;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 31F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.exitButton;
-            this.ClientSize = new System.Drawing.Size(640, 611);
+            this.ClientSize = new System.Drawing.Size(1493, 1578);
             this.ControlBox = false;
             this.Controls.Add(this.titleLabel);
             this.Controls.Add(this.emailTextBox);
@@ -212,6 +220,8 @@ namespace OpenHardwareMonitor.GUI {
             this.Controls.Add(this.label3);
             this.Controls.Add(this.exitButton);
             this.Controls.Add(this.sendButton);
+            this.Font = new System.Drawing.Font("微软雅黑", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
+            this.Margin = new System.Windows.Forms.Padding(7, 8, 7, 8);
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "ReportForm";

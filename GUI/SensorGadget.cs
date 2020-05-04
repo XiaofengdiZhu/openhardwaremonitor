@@ -59,6 +59,7 @@ namespace OpenHardwareMonitor.GUI {
     private Font largeFont;
     private Font smallFont;
     private Brush darkWhite;
+    private Brush lightBlack;
     private StringFormat stringFormat;
     private StringFormat trimStringFormat;
     private StringFormat alignRightStringFormat;
@@ -72,6 +73,7 @@ namespace OpenHardwareMonitor.GUI {
       computer.HardwareRemoved += new HardwareEventHandler(HardwareRemoved);      
 
       this.darkWhite = new SolidBrush(Color.FromArgb(0xF0, 0xF0, 0xF0));
+      this.lightBlack = new SolidBrush(Color.FromArgb(0x10, 0x10, 0x10));
 
       this.stringFormat = new StringFormat();
       this.stringFormat.FormatFlags = StringFormatFlags.NoWrap;
@@ -142,14 +144,16 @@ namespace OpenHardwareMonitor.GUI {
       MenuItem hardwareNamesItem = new MenuItem("硬件名称");
       contextMenu.MenuItems.Add(hardwareNamesItem);
       MenuItem fontSizeMenu = new MenuItem("字体大小");
-      for (int i = 0; i < 4; i++) {
+      for (int i = 0; i < 6; i++) {
         float size;
         string name;
         switch (i) {
           case 0: size = 6.5f; name = "小"; break;
           case 1: size = 7.5f; name = "中"; break;
           case 2: size = 9f; name = "大"; break;
-          case 3: size = 11f; name = "夶"; break;
+          case 3: size = 11f; name = "庞"; break;
+          case 4: size = 14f; name = "巨"; break;
+          case 5: size = 18f; name = "宏"; break;
           default: throw new NotImplementedException();
         }
         MenuItem item = new MenuItem(name);
@@ -217,7 +221,7 @@ namespace OpenHardwareMonitor.GUI {
         };
         backgroundImageCoverOpacityMenu.MenuItems.Add(item);
       }
-      MenuItem backgroundImageCoverColorItem = new MenuItem("背景图片蒙层颜色(黑/白)");
+      MenuItem backgroundImageCoverColorItem = new MenuItem("切换亮暗主题");
       contextMenu.MenuItems.Add(backgroundImageCoverColorItem);
       this.ContextMenu = contextMenu;
 
@@ -321,6 +325,9 @@ namespace OpenHardwareMonitor.GUI {
 
       darkWhite.Dispose();
       darkWhite = null;
+
+      lightBlack.Dispose();
+      lightBlack = null;
 
       stringFormat.Dispose();
       stringFormat = null;
@@ -597,20 +604,22 @@ namespace OpenHardwareMonitor.GUI {
       if (sensors.Count == 0) {
         x = leftBorder + 1;
         g.DrawString("在主窗口右键一个传感器，选择“在悬浮窗显示”。", 
-          smallFont, Brushes.White,
+          smallFont, BackgroundImageCoverColor ? Brushes.Black : Brushes.White,
           new Rectangle(x, y - 1, w - rightBorder - x, 0));
       }
 
-      foreach (KeyValuePair<IHardware, IList<ISensor>> pair in sensors) {
+            Brush basicSensorFontColor = BackgroundImageCoverColor ? lightBlack : darkWhite;
+            foreach (KeyValuePair<IHardware, IList<ISensor>> pair in sensors) {
         if (hardwareNames.Value) {
           if (y > topMargin)
             y += hardwareLineHeight - sensorLineHeight;
           x = leftBorder + 1;
-          if(HardwareBackgroundOpacity!=0) g.FillRectangle(new SolidBrush(Color.FromArgb(HardwareBackgroundOpacity, 0, 0, 0)), new Rectangle(0, y - 8, w, hardwareLineHeight+5));
+          Color HardwareBackgroundColor = BackgroundImageCoverColor ? Color.White : Color.Black;
+          if (HardwareBackgroundOpacity!=0) g.FillRectangle(new SolidBrush(Color.FromArgb(HardwareBackgroundOpacity, HardwareBackgroundColor.R, HardwareBackgroundColor.G, HardwareBackgroundColor.B)), new Rectangle(0, y - 8, w, hardwareLineHeight+5));
           g.DrawImage(HardwareTypeImage.Instance.GetImage(pair.Key.HardwareType),
             new Rectangle(x, y + 1, iconSize, iconSize));
           x += iconSize + 1;
-          g.DrawString(Translate.toChinese(pair.Key.Name), largeFont, Brushes.White,
+          g.DrawString(Translate.toChinese(pair.Key.Name), largeFont, BackgroundImageCoverColor ? Brushes.Black:Brushes.White,
             new Rectangle(x, y - 1, w - rightBorder - x, 0), 
             stringFormat);
           y += hardwareLineHeight;
@@ -703,7 +712,7 @@ namespace OpenHardwareMonitor.GUI {
             } else {
               formatted = "-";
             }
-            Brush sensorColor = darkWhite;
+            Brush sensorColor = basicSensorFontColor;
             if (sensor.SensorType == SensorType.Temperature && sensor.Value.HasValue)
             {
               int value30 = Clamp((int)((sensor.Value - 25) * 14.2857f) * 3, 0, 3000);
@@ -725,13 +734,13 @@ namespace OpenHardwareMonitor.GUI {
               g.FillRectangle(new SolidBrush(Color.FromArgb(ProgressOpacity, progressColor[value30], progressColor[value30 + 1], progressColor[value30 + 2])), new Rectangle(0, y - 3, (int)(w * 0.01f * sensor.Value.Value), sensorLineHeight+1));
             }
             string formattedProgress = sensor.Value.Value.ToString("#0.0") + "%";
-            g.DrawString(formattedProgress, smallFont, darkWhite, new RectangleF(-1, y - 1, w - rightMargin + 3, 0),alignRightStringFormat);
+            g.DrawString(formattedProgress, smallFont, basicSensorFontColor, new RectangleF(-1, y - 1, w - rightMargin + 3, 0),alignRightStringFormat);
             remainingWidth = w - (int)Math.Floor(g.MeasureString(formattedProgress, smallFont, w, StringFormat.GenericTypographic).Width) - rightMargin;
           }
            
           remainingWidth -= leftMargin + 2;
           if (remainingWidth > 0) {
-            g.DrawString(Translate.toChinese(sensor), smallFont, darkWhite,
+            g.DrawString(Translate.toChinese(sensor), smallFont, basicSensorFontColor,
               new RectangleF(leftMargin - 1, y - 1, remainingWidth, 0), 
               trimStringFormat);
           }
