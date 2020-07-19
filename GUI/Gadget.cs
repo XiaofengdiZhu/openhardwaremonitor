@@ -137,7 +137,19 @@ namespace OpenHardwareMonitor.GUI {
       }
     }
 
-    public ContextMenu ContextMenu {
+        private bool colorfulTemperature = true;
+        public bool ColorfulTemperature
+        {
+            get
+            {
+                return colorfulTemperature;
+            }
+            set
+            {
+                colorfulTemperature = value;
+            }
+        }
+        public ContextMenu ContextMenu {
       get {
         return window.ContextMenu;
       }
